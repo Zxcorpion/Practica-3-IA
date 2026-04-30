@@ -8,7 +8,6 @@ from game import Agent
 from pacman import GameState
 
 
-
 class ReflexAgent(Agent):
     """
       A reflex agent chooses an action at each choice point by examining
@@ -74,7 +73,6 @@ class ReflexAgent(Agent):
         # Pick randomly among the best
         chosenIndex = random.choice(bestIndices)
 
-
         return legalMoves[chosenIndex]
 
     def evaluationFunction(self, currentGameState: GameState, action: str) -> float:
@@ -110,12 +108,11 @@ def scoreEvaluationFunction(currentGameState: GameState):
     min_ghostDistance = float('inf')
     currentScore = currentGameState.getScore()
 
-
     for ghost in currentGameState.getGhostPositions():
         currentDistance = manhattanDistance(ghost, currentGameState.getPacmanPosition())
         if currentDistance < min_ghostDistance: min_ghostDistance = currentDistance
 
-    return (currentScore-100*(1.0/min_ghostDistance))
+    return (currentScore - 100 * (1.0 / min_ghostDistance))
     """
     return currentGameState.getScore()
     """
@@ -141,6 +138,7 @@ class MultiAgentSearchAgent(Agent):
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
 
+
 ######################################################################################
 # Problem 1b: implementing minimax
 
@@ -149,31 +147,32 @@ class MinimaxAgent(MultiAgentSearchAgent):
     """
       Your minimax agent (problem 1)
     """
-    def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
-        super().__init__(evalFn,depth)
-        self._numMovimientos = 0
 
+    def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
+        super().__init__(evalFn, depth)
+        self._numMovimientos = 0
 
     def getAction(self, gameState: GameState) -> str:
         # BEGIN_YOUR_CODE (our solution is 22 lines of code, but don't worry if you deviate from this)
         numAgentes = gameState.getNumAgents()
-        def minimax(estado,agente,profundidad):
+
+        def minimax(estado, agente, profundidad):
             if estado.isWin() or estado.isLose():
-                return estado.getScore() #si hemos ganado devolvemos el resultado
+                return estado.getScore()  # si hemos ganado devolvemos el resultado
             if profundidad == 0:
-                return self.evaluationFunction(estado) # si la profundidad es 0 no tenemos mas que hacer
+                return self.evaluationFunction(estado)  # si la profundidad es 0 no tenemos mas que hacer
 
             accionesLegales = estado.getLegalActions(agente)
-            siguienteAgente = (agente + 1) % numAgentes #aqui calculamos si el siguiente nodo es MAX O MIN
+            siguienteAgente = (agente + 1) % numAgentes  # aqui calculamos si el siguiente nodo es MAX O MIN
             # al ser 2: 0(MAX) 1(MIN), si podemos cambiar esta forma de calcularlo la cambiamos por algo mas bonito
-            siguienteProfundidad = profundidad - 1 if siguienteAgente == 0 else profundidad #aqui reducimos la profundidad segun la ronda            if agente == 0: # que sea un nodo MAX
-            if agente == 0: #nodo MAX
+            siguienteProfundidad = profundidad - 1 if siguienteAgente == 0 else profundidad  # aqui reducimos la profundidad segun la ronda            if agente == 0: # que sea un nodo MAX
+            if agente == 0:  # nodo MAX
                 valor = float('-inf')
                 for accion in accionesLegales:
-                    sucesor = estado.generateSuccessor(agente,accion)
-                    valor = max(valor,minimax(sucesor,siguienteAgente,siguienteProfundidad))
+                    sucesor = estado.generateSuccessor(agente, accion)
+                    valor = max(valor, minimax(sucesor, siguienteAgente, siguienteProfundidad))
                 return valor
-            else: #nodo MIN
+            else:  # nodo MIN
                 valor = float('inf')
                 for accion in accionesLegales:
                     sucesor = estado.generateSuccessor(agente, accion)
@@ -184,20 +183,19 @@ class MinimaxAgent(MultiAgentSearchAgent):
         mejorAccion = None
         mejorValor = float('-inf')
 
-
         self._numMovimientos += 1
-        
+
         for accion in accionesLegales:
-            
+
             sucesor = gameState.generateSuccessor(0, accion)
-            valor = minimax(sucesor,1,self.depth)
+            valor = minimax(sucesor, 1, self.depth)
             if valor > mejorValor:
                 mejorAccion = accion
                 mejorValor = valor
-        print(f"Movimientos:",self._numMovimientos)
         return mejorAccion
 
-
+    def final(self, state):
+        print(f"Movimientos totales: {self._numMovimientos}")
 
 
 ######################################################################################
@@ -210,10 +208,11 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
       You may reference the pseudocode for Alpha-Beta pruning here:
       en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning#Pseudocode
     """
+
     def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
-        super().__init__(evalFn,depth)
+        super().__init__(evalFn, depth)
         self._numMovimientos = 0
-    	
+
     def getAction(self, gameState: GameState) -> str:
         """
           Returns the minimax action using self.depth and self.evaluationFunction
@@ -221,45 +220,45 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 
         # BEGIN_YOUR_CODE (our solution is 43 lines of code, but don't worry if you deviate from this)
         numAgentes = gameState.getNumAgents()
-        
+
         def alphabeta(estado, agente, profundidad, alfa, beta):
             if estado.isWin() or estado.isLose():
-                return estado.getScore() #si hemos ganado devolvemos el resultado
+                return estado.getScore()  # si hemos ganado devolvemos el resultado
             if profundidad == 0:
-                return self.evaluationFunction(estado) # si la profundidad es 0 no tenemos mas que hacer
+                return self.evaluationFunction(estado)  # si la profundidad es 0 no tenemos mas que hacer
 
             accionesLegales = estado.getLegalActions(agente)
-            siguienteAgente = (agente + 1) % numAgentes #aqui calculamos si el siguiente nodo es MAX O MIN
-            siguienteProfundidad = profundidad - 1 if siguienteAgente == 0 else profundidad #aqui reducimos la profundidad segun la ronda
-            
-            if agente == 0: #nodo MAX
+            siguienteAgente = (agente + 1) % numAgentes  # aqui calculamos si el siguiente nodo es MAX O MIN
+            siguienteProfundidad = profundidad - 1 if siguienteAgente == 0 else profundidad  # aqui reducimos la profundidad segun la ronda
+
+            if agente == 0:  # nodo MAX
                 valor = float('-inf')
                 for accion in accionesLegales:
-                    sucesor = estado.generateSuccessor(agente,accion)
+                    sucesor = estado.generateSuccessor(agente, accion)
                     valor = max(valor, alphabeta(sucesor, siguienteAgente, siguienteProfundidad, alfa, beta))
-                    
+
                     # hacemos la poda antes de devolver el valor
                     if valor > beta:
                         return valor
-                    alfa = max(alfa, valor) 
+                    alfa = max(alfa, valor)
                 return valor
-                
-            else: #nodo MIN
+
+            else:  # nodo MIN
                 valor = float('inf')
                 for accion in accionesLegales:
                     sucesor = estado.generateSuccessor(agente, accion)
                     valor = min(valor, alphabeta(sucesor, siguienteAgente, siguienteProfundidad, alfa, beta))
-                    
+
                     # hacemos la poda antes de devolver el valor
                     if valor < alfa:
                         return valor
-                    beta = min(beta, valor) 
+                    beta = min(beta, valor)
                 return valor
 
         accionesLegales = gameState.getLegalActions(0)
         mejorAccion = None
         mejorValor = float('-inf')
-        
+
         alfa = float('-inf')
         beta = float('inf')
 
@@ -271,14 +270,13 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             if valor > mejorValor:
                 mejorAccion = accion
                 mejorValor = valor
-                
+
             alfa = max(alfa, mejorValor)
-            
-        print(f"Movimientos:", self._numMovimientos)
+
         return mejorAccion
-        # END_YOUR_CODE
 
-
+    def final(self, state):
+        print(f"Movimientos totales: {self._numMovimientos}")
 
 
 ######################################################################################
@@ -289,10 +287,11 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
     """
       Your expectimax agent (problem 3)
     """
+
     def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
         super().__init__(evalFn, depth)
         self._numMovimientos = 0
-      
+
     def getAction(self, gameState: GameState) -> str:
         """
           Returns the expectimax action using self.depth and self.evaluationFunction
@@ -310,24 +309,23 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
                 return self.evaluationFunction(estado)
 
             accionesLegales = estado.getLegalActions(agente)
-            siguienteAgente = (agente + 1) % numAgentes 
+            siguienteAgente = (agente + 1) % numAgentes
             siguienteProfundidad = profundidad - 1 if siguienteAgente == 0 else profundidad
 
-            if agente == 0: #nodo max
+            if agente == 0:  # nodo max
                 valor = float('-inf')
                 for accion in accionesLegales:
                     sucesor = estado.generateSuccessor(agente, accion)
                     valor = max(valor, expectimax(sucesor, siguienteAgente, siguienteProfundidad))
                 return valor
-                
-            else: #nodo aleatorio
+
+            else:  # nodo aleatorio
                 valorEsperado = 0
                 for accion in accionesLegales:
                     sucesor = estado.generateSuccessor(agente, accion)
                     valorEsperado += expectimax(sucesor, siguienteAgente, siguienteProfundidad)
-                
 
-                return valorEsperado / len(accionesLegales) #devolvemos la media
+                return valorEsperado / len(accionesLegales)  # devolvemos la media
 
         accionesLegales = gameState.getLegalActions(0)
         mejorAccion = None
@@ -338,16 +336,14 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         for accion in accionesLegales:
             sucesor = gameState.generateSuccessor(0, accion)
             valor = expectimax(sucesor, 1, self.depth)
-            
+
             if valor > mejorValor:
                 mejorAccion = accion
                 mejorValor = valor
-
-        print(f"Movimientos:", self._numMovimientos)
         return mejorAccion
 
-
-
+    def final(self, state):
+        print(f"Movimientos totales: {self._numMovimientos}")
 
 
 ######################################################################################
