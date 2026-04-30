@@ -179,16 +179,14 @@ class MinimaxAgent(MultiAgentSearchAgent):
                     valor = min(valor, minimax(sucesor, siguienteAgente, siguienteProfundidad))
                 return valor
 
-        accionesLegales = gameState.getLegalActions(0)
+        accionesLegales = gameState.getLegalActions(self.index)
         mejorAccion = None
         mejorValor = float('-inf')
-
         self._numMovimientos += 1
 
         for accion in accionesLegales:
-
-            sucesor = gameState.generateSuccessor(0, accion)
-            valor = minimax(sucesor, 1, self.depth)
+            sucesor = gameState.generateSuccessor(self.index, accion)
+            valor = minimax(sucesor, (self.index + 1) % numAgentes, self.depth)
             if valor > mejorValor:
                 mejorAccion = accion
                 mejorValor = valor
@@ -255,7 +253,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                     beta = min(beta, valor)
                 return valor
 
-        accionesLegales = gameState.getLegalActions(0)
+        accionesLegales = gameState.getLegalActions(self.index)
         mejorAccion = None
         mejorValor = float('-inf')
 
@@ -265,8 +263,8 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         self._numMovimientos += 1
 
         for accion in accionesLegales:
-            sucesor = gameState.generateSuccessor(0, accion)
-            valor = alphabeta(sucesor, 1, self.depth, alfa, beta)
+            sucesor = gameState.generateSuccessor(self.index, accion)
+            valor = alphabeta(sucesor, (self.index + 1) % numAgentes, self.depth, alfa, beta)
             if valor > mejorValor:
                 mejorAccion = accion
                 mejorValor = valor
@@ -327,15 +325,14 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
 
                 return valorEsperado / len(accionesLegales)  # devolvemos la media
 
-        accionesLegales = gameState.getLegalActions(0)
+        accionesLegales = gameState.getLegalActions(self.index)
         mejorAccion = None
         mejorValor = float('-inf')
-
         self._numMovimientos += 1
 
         for accion in accionesLegales:
-            sucesor = gameState.generateSuccessor(0, accion)
-            valor = expectimax(sucesor, 1, self.depth)
+            sucesor = gameState.generateSuccessor(self.index, accion)
+            valor = expectimax(sucesor, (self.index + 1) % numAgentes, self.depth)
 
             if valor > mejorValor:
                 mejorAccion = accion
