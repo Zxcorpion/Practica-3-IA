@@ -2,6 +2,7 @@ from util import manhattanDistance
 from game import Directions
 import random
 import util
+import time
 from typing import Any, DefaultDict, List, Set, Tuple
 
 from game import Agent
@@ -151,9 +152,18 @@ class MinimaxAgent(MultiAgentSearchAgent):
     def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
         super().__init__(evalFn, depth)
         self._numMovimientos = 0
+        self._startTime = None
+        self._tiempoAgotado = False
 
     def getAction(self, gameState: GameState) -> str:
         # BEGIN_YOUR_CODE (our solution is 22 lines of code, but don't worry if you deviate from this)
+        if self._startTime is None:
+            self._startTime = time.time()
+
+        self._numMovimientos += 1
+        if time.time() - self._startTime > 30:
+            self._tiempoAgotado = True
+            return gameState.getLegalActions(self.index)[0]
         numAgentes = gameState.getNumAgents()
 
         def minimax(estado, agente, profundidad):
@@ -182,7 +192,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
         accionesLegales = gameState.getLegalActions(self.index)
         mejorAccion = None
         mejorValor = float('-inf')
-        self._numMovimientos += 1
 
         for accion in accionesLegales:
             sucesor = gameState.generateSuccessor(self.index, accion)
@@ -193,7 +202,15 @@ class MinimaxAgent(MultiAgentSearchAgent):
         return mejorAccion
 
     def final(self, state):
+        if self._tiempoAgotado:
+            estadoFinal = "E"  # Termina sin haber terminado
+        elif state.isWin():
+            estadoFinal = "V"  # Victoria
+        else:
+            estadoFinal = "D"  # Derrota
         print(f"Movimientos totales: {self._numMovimientos}")
+        print(f"Score: {state.getScore()}")
+        print(f"Estado final: {estadoFinal}")
 
 
 ######################################################################################
@@ -210,6 +227,8 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
         super().__init__(evalFn, depth)
         self._numMovimientos = 0
+        self._startTime = None
+        self._tiempoAgotado = False
 
     def getAction(self, gameState: GameState) -> str:
         """
@@ -217,6 +236,13 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
 
         # BEGIN_YOUR_CODE (our solution is 43 lines of code, but don't worry if you deviate from this)
+        if self._startTime is None:
+            self._startTime = time.time()
+
+        self._numMovimientos += 1
+        if time.time() - self._startTime > 30:
+            self._tiempoAgotado = True
+            return gameState.getLegalActions(self.index)[0]
         numAgentes = gameState.getNumAgents()
 
         def alphabeta(estado, agente, profundidad, alfa, beta):
@@ -260,8 +286,6 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         alfa = float('-inf')
         beta = float('inf')
 
-        self._numMovimientos += 1
-
         for accion in accionesLegales:
             sucesor = gameState.generateSuccessor(self.index, accion)
             valor = alphabeta(sucesor, (self.index + 1) % numAgentes, self.depth, alfa, beta)
@@ -274,7 +298,15 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         return mejorAccion
 
     def final(self, state):
+        if self._tiempoAgotado:
+            estadoFinal = "E"  # Termina sin haber terminado
+        elif state.isWin():
+            estadoFinal = "V"  # Victoria
+        else:
+            estadoFinal = "D"  # Derrota
         print(f"Movimientos totales: {self._numMovimientos}")
+        print(f"Score: {state.getScore()}")
+        print(f"Estado final: {estadoFinal}")
 
 
 ######################################################################################
@@ -289,6 +321,8 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
     def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
         super().__init__(evalFn, depth)
         self._numMovimientos = 0
+        self._startTime = None
+        self._tiempoAgotado = False
 
     def getAction(self, gameState: GameState) -> str:
         """
@@ -298,6 +332,13 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
           legal moves.
         """
         # BEGIN_YOUR_CODE
+        if self._startTime is None:
+            self._startTime = time.time()
+
+        self._numMovimientos += 1
+        if time.time() - self._startTime > 30:
+            self._tiempoAgotado = True
+            return gameState.getLegalActions(self.index)[0]
         numAgentes = gameState.getNumAgents()
 
         def expectimax(estado, agente, profundidad):
@@ -328,7 +369,6 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         accionesLegales = gameState.getLegalActions(self.index)
         mejorAccion = None
         mejorValor = float('-inf')
-        self._numMovimientos += 1
 
         for accion in accionesLegales:
             sucesor = gameState.generateSuccessor(self.index, accion)
@@ -340,7 +380,15 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         return mejorAccion
 
     def final(self, state):
+        if self._tiempoAgotado:
+            estadoFinal = "E"  # Termina sin haber terminado
+        elif state.isWin():
+            estadoFinal = "V"  # Victoria
+        else:
+            estadoFinal = "D"  # Derrota
         print(f"Movimientos totales: {self._numMovimientos}")
+        print(f"Score: {state.getScore()}")
+        print(f"Estado final: {estadoFinal}")
 
 
 ######################################################################################
