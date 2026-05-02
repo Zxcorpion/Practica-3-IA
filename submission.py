@@ -3,6 +3,8 @@ from game import Directions
 import random
 import util
 import time
+import threading
+import os
 from typing import Any, DefaultDict, List, Set, Tuple
 
 from game import Agent
@@ -152,18 +154,33 @@ class MinimaxAgent(MultiAgentSearchAgent):
     def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
         super().__init__(evalFn, depth)
         self._numMovimientos = 0
-        self._startTime = None
         self._tiempoAgotado = False
+        self._timer = None
+        self._ultimoEstado = None
+
+    def _agotar_tiempo(self):
+        self._tiempoAgotado = True
+        if self._ultimoEstado is not None:
+            if self._tiempoAgotado:
+                estadoFinal = "E"
+            elif self._ultimoEstado.isWin():
+                estadoFinal = "V"
+            else:
+                estadoFinal = "D"
+            print(f"Movimientos totales: {self._numMovimientos}", flush=True)
+            print(f"Score: {self._ultimoEstado.getScore()}", flush=True)
+            print(f"Estado final: {estadoFinal}", flush=True)
+        time.sleep(0.2)
+        os._exit(0)
 
     def getAction(self, gameState: GameState) -> str:
         # BEGIN_YOUR_CODE (our solution is 22 lines of code, but don't worry if you deviate from this)
-        if self._startTime is None:
-            self._startTime = time.time()
+        if self._numMovimientos == 0:
+            self._timer = threading.Timer(30.0, self._agotar_tiempo)
+            self._timer.start()
 
         self._numMovimientos += 1
-        if time.time() - self._startTime > 30:
-            self._tiempoAgotado = True
-            return gameState.getLegalActions(self.index)[0]
+        self._ultimoEstado = gameState
         numAgentes = gameState.getNumAgents()
 
         def minimax(estado, agente, profundidad):
@@ -202,6 +219,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
         return mejorAccion
 
     def final(self, state):
+        if self._timer:
+            self._timer.cancel()
         if self._tiempoAgotado:
             estadoFinal = "E"  # Termina sin haber terminado
         elif state.isWin():
@@ -211,6 +230,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
         print(f"Movimientos totales: {self._numMovimientos}")
         print(f"Score: {state.getScore()}")
         print(f"Estado final: {estadoFinal}")
+        self._tiempoAgotado = False
+        self._numMovimientos = 0
 
 
 ######################################################################################
@@ -227,8 +248,24 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
         super().__init__(evalFn, depth)
         self._numMovimientos = 0
-        self._startTime = None
         self._tiempoAgotado = False
+        self._timer = None
+        self._ultimoEstado = None
+
+    def _agotar_tiempo(self):
+        self._tiempoAgotado = True
+        if self._ultimoEstado is not None:
+            if self._tiempoAgotado:
+                estadoFinal = "E"
+            elif self._ultimoEstado.isWin():
+                estadoFinal = "V"
+            else:
+                estadoFinal = "D"
+            print(f"Movimientos totales: {self._numMovimientos}", flush=True)
+            print(f"Score: {self._ultimoEstado.getScore()}", flush=True)
+            print(f"Estado final: {estadoFinal}", flush=True)
+        time.sleep(0.2)
+        os._exit(0)
 
     def getAction(self, gameState: GameState) -> str:
         """
@@ -236,13 +273,12 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
 
         # BEGIN_YOUR_CODE (our solution is 43 lines of code, but don't worry if you deviate from this)
-        if self._startTime is None:
-            self._startTime = time.time()
+        if self._numMovimientos == 0:
+            self._timer = threading.Timer(30.0, self._agotar_tiempo)
+            self._timer.start()
 
         self._numMovimientos += 1
-        if time.time() - self._startTime > 30:
-            self._tiempoAgotado = True
-            return gameState.getLegalActions(self.index)[0]
+        self._ultimoEstado = gameState
         numAgentes = gameState.getNumAgents()
 
         def alphabeta(estado, agente, profundidad, alfa, beta):
@@ -298,6 +334,8 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         return mejorAccion
 
     def final(self, state):
+        if self._timer:
+            self._timer.cancel()
         if self._tiempoAgotado:
             estadoFinal = "E"  # Termina sin haber terminado
         elif state.isWin():
@@ -307,6 +345,8 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         print(f"Movimientos totales: {self._numMovimientos}")
         print(f"Score: {state.getScore()}")
         print(f"Estado final: {estadoFinal}")
+        self._tiempoAgotado = False
+        self._numMovimientos = 0
 
 
 ######################################################################################
@@ -321,8 +361,24 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
     def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
         super().__init__(evalFn, depth)
         self._numMovimientos = 0
-        self._startTime = None
         self._tiempoAgotado = False
+        self._timer = None
+        self._ultimoEstado = None
+
+    def _agotar_tiempo(self):
+        self._tiempoAgotado = True
+        if self._ultimoEstado is not None:
+            if self._tiempoAgotado:
+                estadoFinal = "E"
+            elif self._ultimoEstado.isWin():
+                estadoFinal = "V"
+            else:
+                estadoFinal = "D"
+            print(f"Movimientos totales: {self._numMovimientos}", flush=True)
+            print(f"Score: {self._ultimoEstado.getScore()}", flush=True)
+            print(f"Estado final: {estadoFinal}", flush=True)
+        time.sleep(0.2)
+        os._exit(0)
 
     def getAction(self, gameState: GameState) -> str:
         """
@@ -332,13 +388,12 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
           legal moves.
         """
         # BEGIN_YOUR_CODE
-        if self._startTime is None:
-            self._startTime = time.time()
+        if self._numMovimientos == 0:
+            self._timer = threading.Timer(30.0, self._agotar_tiempo)
+            self._timer.start()
 
         self._numMovimientos += 1
-        if time.time() - self._startTime > 30:
-            self._tiempoAgotado = True
-            return gameState.getLegalActions(self.index)[0]
+        self._ultimoEstado = gameState
         numAgentes = gameState.getNumAgents()
 
         def expectimax(estado, agente, profundidad):
@@ -380,6 +435,8 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         return mejorAccion
 
     def final(self, state):
+        if self._timer:
+            self._timer.cancel()
         if self._tiempoAgotado:
             estadoFinal = "E"  # Termina sin haber terminado
         elif state.isWin():
@@ -389,6 +446,8 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         print(f"Movimientos totales: {self._numMovimientos}")
         print(f"Score: {state.getScore()}")
         print(f"Estado final: {estadoFinal}")
+        self._tiempoAgotado = False
+        self._numMovimientos = 0
 
 
 ######################################################################################
